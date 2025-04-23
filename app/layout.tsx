@@ -1,13 +1,14 @@
-import './globals.css';
-import type { Metadata } from 'next';
-import { Inter } from 'next/font/google';
-import { ThemeProvider } from '@/components/theme-provider';
+import "./globals.css";
+import type { Metadata } from "next";
+import { Inter } from "next/font/google";
+import { ThemeProvider } from "@/components/theme-provider";
 
-const inter = Inter({ subsets: ['latin'] });
+const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: 'DROK Technologies - AI Assistant',
-  description: 'Get expert digital marketing, web development, and technology solutions with the DROK AI assistant.',
+  title: "DROK",
+  description:
+    "Get expert digital marketing, web development, and technology solutions with the DROK AI assistant.",
 };
 
 export default function RootLayout({
@@ -18,7 +19,7 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
-        <link rel="icon" href="/drok-logo.png" />
+        <link rel="icon" href="/logo21.png" />
       </head>
       <body className={inter.className}>
         <ThemeProvider

@@ -1,27 +1,33 @@
-import React from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { GlobeIcon, AwardIcon, PhoneIcon } from 'lucide-react';
-import { Separator } from '@/components/ui/separator';
-import Image from 'next/image';
+import React from "react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { GlobeIcon, AwardIcon, PhoneIcon } from "lucide-react";
+import { Separator } from "@/components/ui/separator";
+import Image from "next/image";
 
 export function CompanyInfo() {
   return (
     <Card className="border-0 shadow-none bg-background">
       <CardHeader className="pb-2">
         <CardTitle className="flex items-center text-xl">
-          <div className="relative w-5 h-5 mr-2">
+          <div className="relative w-50 h-34 mr-2">
             <Image
               src="/drok-logo.png"
               alt="DROK Logo"
-              width={20}
-              height={20}
+              width={180}
+              height={120}
               className="object-contain"
             />
+            {/* Changed to rectangular image with size 160x96 from square 128x128 */}
           </div>
-          DROK Technologies
         </CardTitle>
         <CardDescription>
-          Digital marketing & technology solutions
+          LLM for Digital marketing and Sales Made By Digirocket Technologies{" "}
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4 text-sm">
@@ -36,9 +42,9 @@ export function CompanyInfo() {
             <li>London, UK (est. 2025)</li>
           </ul>
         </div>
-        
+
         <Separator />
-        
+
         <div className="space-y-2">
           <h3 className="font-medium flex items-center gap-2">
             <AwardIcon className="h-4 w-4 text-primary" />
@@ -51,19 +57,19 @@ export function CompanyInfo() {
             <li>Semrush Agency & Shopify Partner</li>
           </ul>
         </div>
-        
+
         <Separator />
-        
+
         <div className="space-y-2">
           <h3 className="font-medium flex items-center gap-2">
             <PhoneIcon className="h-4 w-4 text-primary" />
             Get in Touch
           </h3>
           <p className="text-muted-foreground">
-            Schedule a free consultation at{' '}
-            <a 
-              href="https://www.digirocket.io" 
-              target="_blank" 
+            Schedule a free consultation at{" "}
+            <a
+              href="https://www.digirocket.io"
+              target="_blank"
               rel="noopener noreferrer"
               className="text-primary hover:underline"
             >
