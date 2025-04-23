@@ -121,7 +121,7 @@ export async function streamingChat({
       errorMessage = "We've reached our capacity limit. Please try again in a few minutes.";
     } else if (streamingError.message.includes("Service unavailable")) {
       // Start a 90-second countdown with engaging messages
-      let secondsLeft = 10;
+      let secondsLeft = 90;
       const engagingMessages = [
         "Hang tight! We're boosting our servers to deliver stellar performance in {seconds} seconds!",
         "Almost there! Our team is fine-tuning things for you, back in {seconds} seconds!",
