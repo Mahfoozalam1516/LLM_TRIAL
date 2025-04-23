@@ -37,14 +37,33 @@ Structure your responses to:
 Avoid generic responses and ensure answers reflect DigiRocket’s global presence, with operations led by a skilled team including Upasana Rathore (Senior Web Developer), Vaishnavi Gupta (Creative Head), and Nitesh Srivastava (SEO Expert). If addressing sensitive topics (e.g., financials), redirect to official channels (e.g., www.digirocket.io for inquiries). For inspiration, mirror the clarity and client focus seen in DigiRocket’s case studies, such as their SEO overhaul for Clean Sips or web revamp for an IT company, and their active social media presence on platforms like Instagram (@digirockett) and LinkedIn.
 `;
 
+export interface StreamingChatError extends Error {
+  status?: number;
+  code?: string;
+}
+
 export async function streamingChat({
   messages,
   onMessageUpdate,
 }: {
   messages: Message[];
   onMessageUpdate: (content: string) => void;
-}) {
+}): Promise<string> {
   try {
+    // Validate inputs
+    if (!messages || !Array.isArray(messages) || messages.length === 0) {
+      throw new Error("Invalid or empty messages array");
+    }
+    
+    if (typeof onMessageUpdate !== "function") {
+      throw new Error("onMessageUpdate must be a valid function");
+    }
+
+    // Check API configuration
+    if (!process.env.NEXT_PUBLIC_OPENAI_BASE_URL || !process.env.NEXT_PUBLIC_OPENAI_API_KEY) {
+      throw new Error("Missing OpenAI API configuration. Please check environment variables.");
+    }
+
     let content = "";
     
     const stream = await openai.chat.completions.create({
@@ -57,17 +76,87 @@ export async function streamingChat({
       temperature: 0.7,
       top_p: 0.9,
       stream: true,
+    }).catch((error: StreamingChatError) => {
+      if (error.status === 401) {
+        throw new Error("Authentication failed: Invalid API key");
+      } else if (error.status === 429) {
+        throw new Error("Rate limit exceeded: Please try again later");
+      } else if (error.status === 503) {
+        throw new Error("Service unavailable: Please wait for service restoration");
+      }
+      throw new Error(`Failed to initiate chat stream: ${error.message}`);
     });
 
     for await (const chunk of stream) {
-      const delta = chunk.choices[0]?.delta?.content || "";
-      content += delta;
-      onMessageUpdate(content);
+      try {
+        const delta = chunk.choices[0]?.delta?.content || "";
+        content += delta;
+        onMessageUpdate(content);
+      } catch (chunkError) {
+        console.error("Error processing stream chunk:", chunkError);
+        throw new Error("Error processing response stream");
+      }
+    }
+
+    if (!content) {
+      throw new Error("No content received from the stream");
     }
 
     return content;
   } catch (error) {
-    console.error("Error in streamingChat:", error);
-    throw error;
+    const streamingError = error as StreamingChatError;
+    console.error("Streaming Chat Error:", {
+      message: streamingError.message,
+      status: streamingError.status,
+      code: streamingError.code,
+      stack: streamingError.stack,
+    });
+
+    // Provide user-friendly error messages
+    let errorMessage = "An unexpected error occurred while processing your request.";
+    
+    if (streamingError.message.includes("Invalid API key")) {
+      errorMessage = "Authentication failed. Please contact support at www.digirocket.io.";
+    } else if (streamingError.message.includes("Rate limit exceeded")) {
+      errorMessage = "We've reached our capacity limit. Please try again in a few minutes.";
+    } else if (streamingError.message.includes("Service unavailable")) {
+      // Start a 90-second countdown with engaging messages
+      let secondsLeft = 10;
+      const engagingMessages = [
+        "Hang tight! We're boosting our servers to deliver stellar performance in {seconds} seconds!",
+        "Almost there! Our team is fine-tuning things for you, back in {seconds} seconds!",
+        "Get ready! We're powering up our systems for you, just {seconds} seconds to go!",
+        "We're crafting something amazing! Service resuming in {seconds} seconds!",
+        "Hold on! Our digital rockets are relaunching in {seconds} seconds!"
+      ];
+
+      // Select a random engaging message and replace {seconds} with the current countdown
+      const getRandomMessage = () => {
+        const randomIndex = Math.floor(Math.random() * engagingMessages.length);
+        return engagingMessages[randomIndex].replace("{seconds}", secondsLeft.toString());
+      };
+
+      errorMessage = getRandomMessage();
+      onMessageUpdate(`Error: ${errorMessage}`);
+      
+      const countdownInterval = setInterval(() => {
+        secondsLeft--;
+        if (secondsLeft >= 0) {
+          errorMessage = getRandomMessage();
+          onMessageUpdate(`Error: ${errorMessage}`);
+        } else {
+          clearInterval(countdownInterval);
+          onMessageUpdate("Error: Service is now available! Please try again or visit www.digirocket.io for support.");
+        }
+      }, 1000);
+      
+      throw new Error(errorMessage);
+    } else if (streamingError.message.includes("Invalid or empty messages")) {
+      errorMessage = "Please provide valid message content to proceed.";
+    }
+
+    // Pass the error message to the callback for UI display
+    onMessageUpdate(`Error: ${errorMessage}`);
+    throw new Error(errorMessage);
   }
 }
