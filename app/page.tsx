@@ -3,7 +3,6 @@
 import React from "react";
 import { ChatContainer } from "@/components/chat-container";
 import { CompanyInfo } from "@/components/company-info";
-import { ModeToggle } from "@/components/theme-toggle";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { MessageSquareIcon, InfoIcon } from "lucide-react";
 import Image from "next/image";
@@ -25,7 +24,6 @@ export default function Home() {
             </div>
             <h1 className="text-lg font-bold"></h1>
           </div>
-          <ModeToggle />
         </div>
       </header>
 
